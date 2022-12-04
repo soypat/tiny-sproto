@@ -30,7 +30,7 @@ func NewFrame(buffer []byte) *Frame {
 
 func (f *Frame) SetData(data []byte) error {
 	if len(data) > f.Size() {
-		return errors.New("data length greater than buffer capacity")
+		return errors.New("datagram length greater than buffer capacity")
 	}
 	f.setLen(len(data))
 	copy(f.data, data)
@@ -87,7 +87,7 @@ readloop:
 	}
 	if status != END {
 		if len(f.data) == 0 {
-			err = fmt.Errorf("buffer too small (%d) for message", f.Size())
+			err = fmt.Errorf("buffer too small (%d) for datagram", f.Size())
 		} else {
 			err = fmt.Errorf("did not reach END byte(%d):%w", status, err)
 		}
@@ -106,7 +106,7 @@ func (f *Frame) Read(b []byte) (n int, err error) {
 		b[0] = sof
 		n++
 	}
-	for ; dataPtr < toWrite; dataPtr++ {
+	for ; dataPtr < frameLen; dataPtr++ {
 		c := f.data[dataPtr]
 		remaining := len(b) - n
 		if remaining < 2 {
